@@ -47,6 +47,8 @@ usage: ./address-miner [OPTIONS]
     Address Miner is a vanity address generator for Address Market NFT addresses that
 	utilizes computing power from GPUs using OpenCL.
 
+    https://address-market.com
+
     Based on ERADICATE2 repo by Johan Gustafsson <johan@johgu.se>
     Beer donations for him: 0x000dead000ae1c8e8ac27103e4ff65f42a4e9203
 )";

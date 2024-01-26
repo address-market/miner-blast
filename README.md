@@ -1,4 +1,4 @@
-# Address Market Generator
+# Address Miner
 ```
 usage: ./address-miner [OPTIONS]
 
@@ -40,7 +40,7 @@ usage: ./address-miner [OPTIONS]
     ./address-miner --leading-zeroes
 
   About:
-    Address Miner is a vanity address generator for Address Market NFT addresses that
+    Address Miner is a vanity address generator for [Address Market NFT](https://address-market.com) addresses that
 	utilizes computing power from GPUs using OpenCL.
 
     Based on ERADICATE2 repo by Johan Gustafsson <johan@johgu.se>
