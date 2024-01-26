@@ -14,6 +14,12 @@ mode ModeFactory::zerobytes() {
 	return r;
 }
 
+mode ModeFactory::leadingZeroes() {
+	mode r;
+	r.function = ModeFunction::LeadingZeroes;
+	return r;
+}
+
 mode ModeFactory::zeros() {
 	return range(0, 0);
 }
