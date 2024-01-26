@@ -321,7 +321,7 @@ int main(int argc, char * * argv) {
 			// Create a program from the kernel source
 			std::cout << "  Compiling kernel..." << std::flush;
 			const std::string strKeccak = readFile("keccak.cl");
-			const std::string strVanity = readFile("eradicate2.cl");
+			const std::string strVanity = readFile("address-miner.cl");
 			const char * szKernels[] = { strKeccak.c_str(), strVanity.c_str() };
 
 			clProgram = clCreateProgramWithSource(clContext, sizeof(szKernels) / sizeof(char *), szKernels, NULL, &errorCode);

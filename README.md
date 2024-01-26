@@ -1,6 +1,6 @@
 # Address Market Generator
 ```
-usage: ./ERADICATE2 [OPTIONS]
+usage: ./address-miner [OPTIONS]
 
   Basic modes:
     --benchmark             Run without any scoring, a benchmark.
@@ -36,11 +36,11 @@ usage: ./ERADICATE2 [OPTIONS]
                             [default = 16777216]
 
   Examples:
-    ./ERADICATE2 --leading 0
-    ./ERADICATE2 --zeros
+    ./address-miner --leading 0
+    ./address-miner --leading-zeroes
 
   About:
-    Address Market Generator is a vanity address generator for Address Market NFT addresses that
+    Address Miner is a vanity address generator for Address Market NFT addresses that
 	utilizes computing power from GPUs using OpenCL.
 
     Based on ERADICATE2 repo by Johan Gustafsson <johan@johgu.se>
