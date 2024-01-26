@@ -1,16 +1,6 @@
-# ERADICATE2
+# Address Market Generator
 ```
-usage: ./ERADICATE2 [OPTIONS]
-
-  Input:
-    -A, --address           Target address
-    -I, --init-code         Init code
-    -i, --init-code-file    Read init code from this file
-
-    The init code should be expressed as a hexadecimal string having the
-    prefix 0x both when expressed on the command line with -I and in the
-    file pointed to by -i if used. Any whitespace will be trimmed. If no
-    init code is specified it defaults to an empty string.
+usage: ./address-miner [OPTIONS]
 
   Basic modes:
     --benchmark             Run without any scoring, a benchmark.
@@ -19,6 +9,7 @@ usage: ./ERADICATE2 [OPTIONS]
     --numbers               Score on numbers anywhere in hash.
     --mirror                Score on mirroring from center.
     --leading-doubles       Score on hashes leading with hexadecimal pairs
+    --leading-zeroes        Score on hashes leading with zeros
 
   Modes with arguments:
     --leading <single hex>  Score on hashes leading with given hex character.
@@ -45,13 +36,13 @@ usage: ./ERADICATE2 [OPTIONS]
                             [default = 16777216]
 
   Examples:
-    ./ERADICATE2 -A 0x00000000000000000000000000000000deadbeef -I 0x00 --leading 0
-    ./ERADICATE2 -A 0x00000000000000000000000000000000deadbeef -I 0x00 --zeros
+    ./address-miner --leading 0
+    ./address-miner --leading-zeroes
 
   About:
-    ERADICATE2 is a vanity address generator for CREATE2 addresses that
+    Address Miner is a vanity address generator for Address Market NFT addresses that
 	utilizes computing power from GPUs using OpenCL.
 
-    Author: Johan Gustafsson <johan@johgu.se>
-    Beer donations: 0x000dead000ae1c8e8ac27103e4ff65f42a4e9203
+    Based on ERADICATE2 repo by Johan Gustafsson <johan@johgu.se>
+    Beer donations for him: 0x000dead000ae1c8e8ac27103e4ff65f42a4e9203
 ```

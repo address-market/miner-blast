@@ -181,6 +181,7 @@ int main(int argc, char * * argv) {
 		bool bModeBenchmark = false;
 		bool bModeZeroBytes = false;
 		bool bModeZeros = false;
+		bool bModeLeadingZeroes = false;
 		bool bModeLetters = false;
 		bool bModeNumbers = false;
 		std::string strModeLeading;
@@ -195,9 +196,8 @@ int main(int argc, char * * argv) {
 		size_t worksizeLocal = 128;
 		size_t worksizeMax = 0; // Will be automatically determined later if not overriden by user
 		size_t size = 16777216;
-		std::string strAddress;
-		std::string strInitCode;
-		std::string strInitCodeFile;
+		std::string strAddress = "0xB9af59262147673C2016b2b10808411166756ed3";
+		std::string strInitCode = "0x6034600d60003960346000f3fe6000548060008114602b573660008037600080366000855af43d6000803e806026573d6000fd5b3d6000f35b6000356000555050";
 
 		argp.addSwitch('h', "help", bHelp);
 		argp.addSwitch('0', "benchmark", bModeBenchmark);
@@ -211,15 +211,13 @@ int main(int argc, char * * argv) {
 		argp.addSwitch('7', "range", bModeRange);
 		argp.addSwitch('8', "mirror", bModeMirror);
 		argp.addSwitch('9', "leading-doubles", bModeDoubles);
+		argp.addSwitch('l', "leading-zeroes", bModeLeadingZeroes);
 		argp.addSwitch('m', "min", rangeMin);
 		argp.addSwitch('M', "max", rangeMax);
 		argp.addMultiSwitch('s', "skip", vDeviceSkipIndex);
 		argp.addSwitch('w', "work", worksizeLocal);
 		argp.addSwitch('W', "work-max", worksizeMax);
 		argp.addSwitch('S', "size", size);
-		argp.addSwitch('A', "address", strAddress);
-		argp.addSwitch('I', "init-code", strInitCode);
-		argp.addSwitch('i', "init-code-file", strInitCodeFile);
 
 		if (!argp.parse()) {
 			std::cout << "error: bad arguments, try again :<" << std::endl;
@@ -231,17 +229,6 @@ int main(int argc, char * * argv) {
 			return 0;
 		}
 
-		// Parse hexadecimal values and/or read init code from file
-		if (strInitCodeFile != "") {
-			std::ifstream ifs(strInitCodeFile);
-			if (!ifs.is_open()) {
-				std::cout << "error: failed to open input file for init code" << std::endl;
-				return 1;
-			}
-			strInitCode.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
-		}
-
-		trim(strInitCode);
 		const std::string strAddressBinary = parseHexadecimalBytes(strAddress);
 		const std::string strInitCodeBinary = parseHexadecimalBytes(strInitCode);
 		const std::string strInitCodeDigest = keccakDigest(strInitCodeBinary);
@@ -252,7 +239,9 @@ int main(int argc, char * * argv) {
 			mode = ModeFactory::benchmark();
 		} else if (bModeZeroBytes) {
 			mode = ModeFactory::zerobytes();
-		}  else if (bModeZeros) {
+		} else if (bModeLeadingZeroes) {
+			mode = ModeFactory::leadingZeroes();
+		} else if (bModeZeros) {
 			mode = ModeFactory::zeros();
 		} else if (bModeLetters) {
 			mode = ModeFactory::letters();
@@ -332,7 +321,7 @@ int main(int argc, char * * argv) {
 			// Create a program from the kernel source
 			std::cout << "  Compiling kernel..." << std::flush;
 			const std::string strKeccak = readFile("keccak.cl");
-			const std::string strVanity = readFile("eradicate2.cl");
+			const std::string strVanity = readFile("address-miner.cl");
 			const char * szKernels[] = { strKeccak.c_str(), strVanity.c_str() };
 
 			clProgram = clCreateProgramWithSource(clContext, sizeof(szKernels) / sizeof(char *), szKernels, NULL, &errorCode);

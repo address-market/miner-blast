@@ -1,5 +1,5 @@
 enum ModeFunction {
-	Benchmark, ZeroBytes, Matching, Leading, Range, Mirror, Doubles, LeadingRange
+	Benchmark, ZeroBytes, Matching, Leading, Range, Mirror, Doubles, LeadingRange, LeadingZeroes
 };
 
 typedef struct {
@@ -14,6 +14,18 @@ typedef struct __attribute__((packed)) {
 	uint found;
 } result;
 
+#ifndef ERADICATE2_INITHASH
+#define ERADICATE2_INITHASH 0x000
+typedef union {
+	uchar b[200];
+	ulong q[25];
+	uint d[50];
+} ethhash;
+void sha3_keccakf(ethhash * const h)
+{
+}
+#endif
+
 __kernel void eradicate2_iterate(__global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_result_update(const uchar * const hash, __global result * const pResult, const uchar score, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_leading(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
@@ -22,6 +34,7 @@ void eradicate2_score_zerobytes(const uchar * const hash, __global result * cons
 void eradicate2_score_matching(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_range(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_leadingrange(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
+void eradicate2_score_leadingzeroes(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_mirror(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_doubles(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 
@@ -37,13 +50,28 @@ __kernel void eradicate2_iterate(__global result * const pResult, __global const
 	h.d[7] += get_global_id(0);
 	h.d[8] += round;
 
+	uchar salt[200];
+	for (int i = 0; i < 200; i++) {
+		salt[i] = h.b[i];
+	}
+
 	// Hash
 	sha3_keccakf(&h);
 
-	/* enum class ModeFunction {
-	 *      Benchmark, ZeroBytes, Matching, Leading, Range, Mirror, Doubles, LeadingRange
-	 * };
-	 */
+	h.b[0] = 0xd6;
+	h.b[1] = 0x94;
+	#pragma unroll
+	for (int i = 12; i < 42; i++) {
+		h.b[i - 10] = h.b[i];
+	}
+	h.b[22] = 0x01;
+	h.b[23] = 0x01; // padding
+	#pragma unroll
+	for (int i = 24; i < 200; i++) {
+		h.b[i] = 0;
+	}
+	sha3_keccakf(&h);
+
 	switch (pMode->function) {
 	case Benchmark:
 		eradicate2_score_benchmark(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
@@ -75,6 +103,10 @@ __kernel void eradicate2_iterate(__global result * const pResult, __global const
 
 	case LeadingRange:
 		eradicate2_score_leadingrange(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
+		break;
+
+	case LeadingZeroes:
+		eradicate2_score_leadingzeroes(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
 		break;
 	}
 }
@@ -194,6 +226,23 @@ void eradicate2_score_leadingrange(const uchar * const hash, __global result * c
 			++score;
 		}
 		else {
+			break;
+		}
+	}
+
+	eradicate2_result_update(hash, pResult, score, scoreMax, deviceIndex, round);
+}
+
+void eradicate2_score_leadingzeroes(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round){
+	int score = 0;
+
+	for (int i = 0; i < 20; ++i) {
+		if (!hash[i]) {
+			score += 2;
+		} else if (hash[i] < 16) {
+			score += 1;
+			break;
+		} else {
 			break;
 		}
 	}
