@@ -19,7 +19,7 @@ class ModeFactory {
 
 		static mode benchmark();
 		static mode zerobytes();
-		static mode leadingZeroes();
+		static mode leadingAny();
 		static mode zeros();
 		static mode letters();
 		static mode numbers();

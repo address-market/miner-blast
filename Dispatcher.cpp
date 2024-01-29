@@ -176,9 +176,9 @@ void Dispatcher::deviceDispatch(Device & d) {
 			if (i >= m_clScoreMax) {
 				m_clScoreMax = i;
 
-				// TODO: Add quit condition
+					// TODO: Add quit condition
 
-				printResult(r, i, timeStart);
+					printResult(r, i, timeStart);
 			}
 
 			break;

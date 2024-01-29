@@ -181,7 +181,7 @@ int main(int argc, char * * argv) {
 		bool bModeBenchmark = false;
 		bool bModeZeroBytes = false;
 		bool bModeZeros = false;
-		bool bModeLeadingZeroes = false;
+		bool bModeLeadingAny = false;
 		bool bModeLetters = false;
 		bool bModeNumbers = false;
 		std::string strModeLeading;
@@ -211,7 +211,7 @@ int main(int argc, char * * argv) {
 		argp.addSwitch('7', "range", bModeRange);
 		argp.addSwitch('8', "mirror", bModeMirror);
 		argp.addSwitch('9', "leading-doubles", bModeDoubles);
-		argp.addSwitch('l', "leading-zeroes", bModeLeadingZeroes);
+		argp.addSwitch('l', "leading-any", bModeLeadingAny);
 		argp.addSwitch('m', "min", rangeMin);
 		argp.addSwitch('M', "max", rangeMax);
 		argp.addMultiSwitch('s', "skip", vDeviceSkipIndex);
@@ -239,8 +239,8 @@ int main(int argc, char * * argv) {
 			mode = ModeFactory::benchmark();
 		} else if (bModeZeroBytes) {
 			mode = ModeFactory::zerobytes();
-		} else if (bModeLeadingZeroes) {
-			mode = ModeFactory::leadingZeroes();
+		} else if (bModeLeadingAny) {
+			mode = ModeFactory::leadingAny();
 		} else if (bModeZeros) {
 			mode = ModeFactory::zeros();
 		} else if (bModeLetters) {

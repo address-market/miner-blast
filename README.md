@@ -9,7 +9,7 @@ usage: ./address-miner [OPTIONS]
     --numbers               Score on numbers anywhere in hash.
     --mirror                Score on mirroring from center.
     --leading-doubles       Score on hashes leading with hexadecimal pairs
-    --leading-zeroes        Score on hashes leading with zeros
+    --leading-any           Score on hashes leading with any symbol
 
   Modes with arguments:
     --leading <single hex>  Score on hashes leading with given hex character.
@@ -37,7 +37,7 @@ usage: ./address-miner [OPTIONS]
 
   Examples:
     ./address-miner --leading 0
-    ./address-miner --leading-zeroes
+    ./address-miner --leading-any
 
   About:
     Address Miner is a vanity address generator for [Address Market NFT](https://address-market.com) addresses that

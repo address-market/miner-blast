@@ -14,9 +14,9 @@ mode ModeFactory::zerobytes() {
 	return r;
 }
 
-mode ModeFactory::leadingZeroes() {
+mode ModeFactory::leadingAny() {
 	mode r;
-	r.function = ModeFunction::LeadingZeroes;
+	r.function = ModeFunction::LeadingAny;
 	return r;
 }
 

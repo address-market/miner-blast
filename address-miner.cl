@@ -1,5 +1,5 @@
 enum ModeFunction {
-	Benchmark, ZeroBytes, Matching, Leading, Range, Mirror, Doubles, LeadingRange, LeadingZeroes
+	Benchmark, ZeroBytes, Matching, Leading, Range, Mirror, Doubles, LeadingRange, LeadingAny
 };
 
 typedef struct {
@@ -34,7 +34,7 @@ void eradicate2_score_zerobytes(const uchar * const hash, __global result * cons
 void eradicate2_score_matching(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_range(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_leadingrange(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
-void eradicate2_score_leadingzeroes(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
+void eradicate2_score_leadingany(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_mirror(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 void eradicate2_score_doubles(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round);
 
@@ -105,14 +105,14 @@ __kernel void eradicate2_iterate(__global result * const pResult, __global const
 		eradicate2_score_leadingrange(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
 		break;
 
-	case LeadingZeroes:
-		eradicate2_score_leadingzeroes(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
+	case LeadingAny:
+		eradicate2_score_leadingany(h.b + 12, pResult, pMode, scoreMax, deviceIndex, round);
 		break;
 	}
 }
 
 void eradicate2_result_update(const uchar * const H, __global result * const pResult, const uchar score, const uchar scoreMax, const uint deviceIndex, const uint round) {
-	if (score && score > scoreMax) {
+	if (score && score >= scoreMax) {
 		const uchar hasResult = atomic_inc(&pResult[score].found); // NOTE: If "too many" results are found it'll wrap around to 0 again and overwrite last result. Only relevant if global worksize exceeds MAX(uint).
 
 		// Save only one result for each score, the first.
@@ -233,15 +233,20 @@ void eradicate2_score_leadingrange(const uchar * const hash, __global result * c
 	eradicate2_result_update(hash, pResult, score, scoreMax, deviceIndex, round);
 }
 
-void eradicate2_score_leadingzeroes(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round){
+void eradicate2_score_leadingany(const uchar * const hash, __global result * const pResult, __global const mode * const pMode, const uchar scoreMax, const uint deviceIndex, const uint round){
 	int score = 0;
+	uchar firstSymbol = (hash[0] & 0xF0) >> 4;
 
 	for (int i = 0; i < 20; ++i) {
-		if (!hash[i]) {
-			score += 2;
-		} else if (hash[i] < 16) {
+		uchar highNibble = (hash[i] & 0xF0) >> 4;
+		uchar lowNibble = hash[i] & 0x0F;
+		if (highNibble == firstSymbol) {
 			score += 1;
+		} else {
 			break;
+		}
+		if (lowNibble == firstSymbol) {
+			score += 1;
 		} else {
 			break;
 		}
