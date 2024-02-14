@@ -196,7 +196,7 @@ int main(int argc, char * * argv) {
 		size_t worksizeLocal = 128;
 		size_t worksizeMax = 0; // Will be automatically determined later if not overriden by user
 		size_t size = 16777216;
-		std::string strAddress = "0xB9af59262147673C2016b2b10808411166756ed3";
+		std::string strAddress = "0xf5d01daE561CDe81B555FbfcB41B81C26CDEeA16";
 		std::string strInitCode = "0x6034600d60003960346000f3fe6000548060008114602b573660008037600080366000855af43d6000803e806026573d6000fd5b3d6000f35b6000356000555050";
 
 		argp.addSwitch('h', "help", bHelp);
